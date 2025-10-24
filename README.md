@@ -11,4 +11,5 @@ fallback_password: "SECRET"
 
 esphome run mycosensor.yaml
 
-
+# RESSOURCE : 
+https://vdbrink.github.io/esphome/co2_scd40.html

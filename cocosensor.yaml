@@ -28,9 +28,11 @@ i2c:
   scan: true
   id: bus_a
   # frequency: 100kHz
+
 sensor:
   - platform: scd4x
     update_interval: 10s
+    automatic_self_calibration: true #TODO: mycoco should be manually calibrated
     i2c_id: bus_a
     co2:
       name: "myco_CO2"
@@ -38,6 +40,26 @@ sensor:
       name: "myco_temperature"
     humidity:
       name: "myco_humidity"
+
+# TODO: MQTT
+# Push the data also to MQTT topics: 
+# * CO2 espscd40/sensor/scd40_co2/state
+# * Temperature espscd40/sensor/co2_temperature/state  
+# * Humidity espscd40/sensor/co2_humidity/state
+# mqtt:
+#   broker: 192.168.XXX.XXX
+#   port: 1883
+#   username: "XXXX"
+#   password: "XXXX"
+
+# TODO : implement forced calibration
+# on_...:
+#   then:
+#     - scd4x.perform_forced_calibration:
+#         # Global Monthly Mean CO₂
+#         # https://gml.noaa.gov/ccgg/trends/global.html
+#         value: 426
+#         id: my_scd41
 
 wifi:
   ssid: !secret wifi_ssid
