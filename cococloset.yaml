@@ -1,0 +1,65 @@
+esphome:
+  name: cococloset
+
+esp32:
+  variant: esp32s2
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+
+logger:
+
+wifi:
+  networks:
+  - ssid: !secret ssid_a
+    password: !secret password_a
+  - ssid: !secret ssid_b
+    password: !secret password_b
+  #options below seem needed to stabilize connection
+  power_save_mode: none
+  fast_connect: on
+  output_power: 8.5
+  reboot_timeout: 15min
+
+api:
+  password: !secret api_password
+
+button:
+  - platform: template
+    name: "co2 manual calibration (only in fresh air for at least 20min)"
+    entity_category: "config"
+    on_press:
+      then:
+      - scd4x.perform_forced_calibration:
+          value: 426
+
+
+i2c:
+  sda: GPIO33
+  scl: GPIO35
+  scan: true
+  id: bus_a
+
+sensor:
+  - platform: scd4x
+    id: scd4x_sensor
+    update_interval: 10s
+    automatic_self_calibration: false
+    i2c_id: bus_a
+    co2:
+      name: "cococloset_CO2"
+    temperature:
+      name: "cococloset_temperature"
+    humidity:
+      name: "cococloset_humidity"
+
+
+ota:
+  - platform: esphome
+    password: !secret api_password
+
+web_server:
+  port: 5083
+  local: true
+
+

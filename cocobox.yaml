@@ -1,0 +1,58 @@
+esphome:
+  name: cocobox
+
+esp32:
+  board: um_feathers2
+  framework:
+    type: esp-idf
+
+logger:
+
+wifi:
+  networks:
+  - ssid: !secret ssid_a
+    password: !secret password_a
+  - ssid: !secret ssid_b
+    password: !secret password_b
+
+api:
+  password: !secret api_password
+
+button:
+  - platform: template
+    name: "co2 manual calibration (only in fresh air for at least 20min)"
+    entity_category: "config"
+    on_press:
+      then:
+      - scd4x.perform_forced_calibration:
+          value: 426
+
+
+i2c:
+  sda: GPIO08
+  scl: GPIO09
+  scan: true
+  id: bus_a
+
+sensor:
+  - platform: scd4x
+    id: scd4x_sensor
+    update_interval: 10s
+    automatic_self_calibration: false
+    i2c_id: bus_a
+    co2:
+      name: "cocobox_CO2"
+    temperature:
+      name: "cocobox_temperature"
+    humidity:
+      name: "cocobox_humidity"
+    
+ota:
+  - platform: esphome
+    password: !secret api_password
+
+web_server:
+  port: 5083
+  local: true
+
+

@@ -1,0 +1,64 @@
+esphome:
+  name: cocolight
+
+esp8266:
+  board: sonoff_basic
+
+logger:
+#   baud_rate: 921600
+  # hardware_uart: UART0
+  level: DEBUG
+
+wifi:
+  networks:
+  - ssid: !secret ssid_a
+    password: !secret password_a
+    manual_ip:
+      static_ip: 192.168.1.100
+      gateway: 192.168.1.1
+      subnet: 255.255.255.0
+
+  - ssid: !secret ssid_b
+    password: !secret password_b
+    #
+    manual_ip:
+      static_ip: 192.168.1.100
+      gateway: 192.168.1.1
+      subnet: 255.255.255.0
+  #options below seem needed to stabilize connection
+  power_save_mode: none
+  # fast_connect: on
+  # output_power: 8.5
+  # reboot_timeout: 15min
+
+#
+# api:
+#   password: 9wepwaju
+
+
+output:
+  - platform: gpio
+    pin: GPIO12
+    id: relay_1
+
+light:
+  - platform: binary
+    name: "My Light"
+    id: light_1
+    output: relay_1
+
+
+web_server:
+  port: 5083
+  local: true
+
+
+
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+#
+ota:
+  - platform: esphome
+    password: !secret api_password
