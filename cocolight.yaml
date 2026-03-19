@@ -1,6 +1,19 @@
 ---
 esphome:
   name: cocolight
+  on_boot:
+    priority: -100   # low priority = runs after wifi + time are ready
+    then:
+      - wait_until:
+          condition:
+            time.has_time:
+      - lambda: |-
+          auto t = id(my_time).now();
+          if (t.hour >= 8 && t.hour < 20) {
+            id(light_1).turn_on().perform();
+          } else {
+            id(light_1).turn_off().perform();
+          }
 
 esp8266:
   board: sonoff_basic
@@ -8,7 +21,7 @@ esp8266:
 logger:
   # baud_rate: 921600
   # hardware_uart: UART0
-  level: INFO
+  level: DEBUG
 
 wifi:
   networks:
@@ -60,3 +73,26 @@ light:
     name: "My Light"
     id: light_1
     output: relay_1
+    restore_mode: ALWAYS_OFF
+
+time:
+  - platform: sntp
+    id: my_time
+    timezone: "Europe/Paris"
+    servers:
+      # We use IP directly because of a limition
+      # with static IP
+      - 216.239.35.0   # time1.google.com
+      - 216.239.35.4   # time2.google.com
+      - 216.239.35.8   # time3.google.com
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 8
+        then:
+          - light.turn_on: light_1
+      - seconds: 0
+        minutes: 0
+        hours: 20
+        then:
+          - light.turn_off: light_1
